@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import '../utils/constants.dart';
-import '../screens/communities_page.dart';
-import '../screens/calls_page.dart';
-import '../screens/chats_page.dart';
-import '../widgets/bottom_nav_bar.dart';
-import 'home_page.dart';
+import 'communities_page.dart';
+import 'chats_page.dart';
+import 'calls_page.dart';
+import 'chat_bot_page.dart';
+import 'profile_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -15,88 +14,62 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   int _currentIndex = 0;
-  
+
   final List<Widget> _pages = [
     const CommunitiesPage(),
-    const CallsPage(),
     const ChatsPage(),
+    const CallsPage(),
+    const ChatBotPage(),
+    const ProfilePage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      // Using the custom bottom navigation bar
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-      // Adding a drawer that includes the logout option
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'AgriTech',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Connect with your agricultural community',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
             ),
-            ListTile(
-              leading: const Icon(Icons.home),
-              title: const Text('Home'),
-              onTap: () {
-                Navigator.pop(context);
-              },
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: const Color(0xFF6E573A),
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white.withOpacity(0.6),
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.groups),
+              label: 'Communities',
             ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                Navigator.pop(context);
-              },
+            BottomNavigationBarItem(
+              icon: Icon(Icons.chat_bubble_outline),
+              label: 'Chats',
             ),
-            ListTile(
-              leading: const Icon(Icons.help),
-              title: const Text('Help & Support'),
-              onTap: () {
-                Navigator.pop(context);
-              },
+            BottomNavigationBarItem(
+              icon: Icon(Icons.call),
+              label: 'Calls',
             ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                  (route) => false,
-                );
-              },
+            BottomNavigationBarItem(
+              icon: Icon(Icons.support_agent),
+              label: 'ChatBot',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
             ),
           ],
         ),

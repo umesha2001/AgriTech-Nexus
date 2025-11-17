@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:agritech_app/utils/constants.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -31,6 +30,7 @@ class CustomBottomNavBar extends StatelessWidget {
           _buildNavItem(0, Icons.people, 'Communities'),
           _buildNavItem(1, Icons.call, 'Calls'),
           _buildNavItem(2, Icons.chat_bubble, 'Chats'),
+          _buildNavItem(3, Icons.person, 'Profile'),
         ],
       ),
     );

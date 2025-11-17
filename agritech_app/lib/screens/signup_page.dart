@@ -3,7 +3,14 @@ import '../utils/constants.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
 
-class SignupPageState extends State<SignupPage> {
+class SignupPage extends StatefulWidget {
+  const SignupPage({Key? key}) : super(key: key);
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -39,66 +46,53 @@ class SignupPageState extends State<SignupPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
                 // App Name
                 const Text(
                   'AgriTech',
                   style: TextStyle(
-                    fontSize: 40,
+                    fontSize: 36,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Colors.white,
                     shadows: [
                       Shadow(
                         blurRadius: 10.0,
-                        color: Colors.white70,
-                        offset: Offset(1.0, 1.0),
+                        color: Colors.black45,
+                        offset: Offset(2.0, 2.0),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
                 // Profile Image Placeholder
                 Container(
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(200), // Fixed deprecated withOpacity
+                    color: Colors.white.withOpacity(0.8),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+                    border: Border.all(color: Colors.white, width: 3),
                   ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      const Icon(
-                        Icons.person,
-                        size: 60,
-                        color: Colors.black54,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.add,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: const Icon(
+                    Icons.person,
+                    size: 60,
+                    color: Colors.black54,
                   ),
                 ),
+                const SizedBox(height: 10),
                 const Text(
                   'Sign Up',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 8.0,
+                        color: Colors.black45,
+                        offset: Offset(1.0, 1.0),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -107,7 +101,7 @@ class SignupPageState extends State<SignupPage> {
                   margin: const EdgeInsets.symmetric(horizontal: 24),
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(230), // Fixed deprecated withOpacity
+                    color: Colors.white.withOpacity(0.95),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
@@ -169,11 +163,10 @@ class SignupPageState extends State<SignupPage> {
                       ),
                       const SizedBox(height: 20),
                       CustomButton(
-                        text: 'Login',
+                        text: 'Sign Up',
                         onPressed: () {
-                          // Validate fields and register user
-                          if (_validateFields()) {
-                            // Navigate to login page after successful registration
+                          if (_validateForm()) {
+                            // Navigate back to login
                             Navigator.pop(context);
                           }
                         },
@@ -193,7 +186,7 @@ class SignupPageState extends State<SignupPage> {
                               Navigator.pop(context);
                             },
                             child: const Text(
-                              'Login!',
+                              'Sign In!',
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
@@ -205,7 +198,7 @@ class SignupPageState extends State<SignupPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -214,8 +207,7 @@ class SignupPageState extends State<SignupPage> {
     );
   }
 
-  bool _validateFields() {
-    // Simple validation
+  bool _validateForm() {
     if (_firstNameController.text.isEmpty ||
         _lastNameController.text.isEmpty ||
         _emailController.text.isEmpty ||
@@ -226,30 +218,14 @@ class SignupPageState extends State<SignupPage> {
       );
       return false;
     }
-    
-    // Check if passwords match
+
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
       );
       return false;
     }
-    
-    // Email validation
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(_emailController.text)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid email address')),
-      );
-      return false;
-    }
-    
+
     return true;
   }
-}
-
-class SignupPage extends StatefulWidget {
-  const SignupPage({Key? key}) : super(key: key);
-
-  @override
-  State<SignupPage> createState() => SignupPageState();
 }

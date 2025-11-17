@@ -1,243 +1,277 @@
 import 'package:flutter/material.dart';
-import 'package:agritech_app/utils/constants.dart';
+import '../utils/constants.dart';
 
 class CommunitiesPage extends StatelessWidget {
   const CommunitiesPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(AppAssets.wheatField),
-          fit: BoxFit.cover,
-          opacity: 0.8,
+    final List<Map<String, dynamic>> communities = [
+      {
+        'title': UserTypes.government,
+        'icon': Icons.account_balance,
+        'color': const Color(0xFF8B7355),
+      },
+      {
+        'title': UserTypes.agricultural,
+        'icon': Icons.agriculture,
+        'color': const Color(0xFF6E8B3D),
+      },
+      {
+        'title': UserTypes.community,
+        'icon': Icons.groups,
+        'color': const Color(0xFF8B6E46),
+      },
+      {
+        'title': UserTypes.seller,
+        'icon': Icons.store,
+        'color': const Color(0xFF7A6952),
+      },
+      {
+        'title': UserTypes.buyer,
+        'icon': Icons.shopping_cart,
+        'color': const Color(0xFF8B7969),
+      },
+      {
+        'title': UserTypes.farmer,
+        'icon': Icons.person,
+        'color': const Color(0xFF6E573A),
+      },
+    ];
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF8B7355),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF8B7355),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white),
+          onPressed: () {
+            // Show navigation menu
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Menu'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.home),
+                      title: const Text('Home'),
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.settings),
+                      title: const Text('Settings'),
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.help),
+                      title: const Text('Help'),
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.info),
+                      title: const Text('About'),
+                      onTap: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Close'),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: AppColors.tabBarBackground,
-          title: const Text(
-            'AgriTech',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+        title: const Text(
+          'AgriTech',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           ),
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.menu, color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications, color: Colors.white),
             onPressed: () {
-              // Open drawer or menu
-              Scaffold.of(context).openDrawer();
+              // Show notifications
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Notifications'),
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        ListTile(
+                          leading: const CircleAvatar(
+                            backgroundColor: Colors.blue,
+                            child: Icon(Icons.agriculture, color: Colors.white),
+                          ),
+                          title: const Text('New agricultural update'),
+                          subtitle: const Text('2 hours ago'),
+                          trailing: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                        ListTile(
+                          leading: const CircleAvatar(
+                            backgroundColor: Colors.orange,
+                            child: Icon(Icons.groups, color: Colors.white),
+                          ),
+                          title: const Text('Community meeting'),
+                          subtitle: const Text('5 hours ago'),
+                        ),
+                        ListTile(
+                          leading: const CircleAvatar(
+                            backgroundColor: Colors.green,
+                            child: Icon(Icons.person, color: Colors.white),
+                          ),
+                          title: const Text('New farmer joined'),
+                          subtitle: const Text('1 day ago'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications, color: Colors.white),
-              onPressed: () {
-                // Open notifications
-              },
+        ],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            color: const Color(0xFF8B7355),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Communities',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                'Communities',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+          ),
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                      decoration: BoxDecoration(
-                        color: AppColors.card.withAlpha(230),
-                        borderRadius: const BorderRadius.horizontal(
-                          left: Radius.circular(20),
-                          right: Radius.circular(20),
+                  const SizedBox(height: 20),
+                  // Search Bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                        filled: true,
+                        fillColor: AppColors.searchBar,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
                         ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'My Communities',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(height: 20),
+                  // Communities List
                   Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-                      decoration: BoxDecoration(
-                        color: AppColors.card.withAlpha(230),
-                        borderRadius: const BorderRadius.horizontal(
-                          left: Radius.circular(20),
-                          right: Radius.circular(20),
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Discover',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: communities.length,
+                      itemBuilder: (context, index) {
+                        final community = communities[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: community['color'],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  community['icon'],
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
+                              title: Text(
+                                community['title'],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppColors.card.withAlpha(230),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.add,
-                        color: Colors.black87,
-                      ),
-                      onPressed: () {
-                        // Create new community
+                        );
                       },
                     ),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.card.withAlpha(230),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.search, color: Colors.black54),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          hintText: 'Search communities',
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(
-                'Join a Community',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _buildCommunityItem(context, 'Government Officers', Icons.account_balance, '1,245 members'),
-                  _buildCommunityItem(context, 'Agricultural Experts', Icons.eco, '843 members'),
-                  _buildCommunityItem(context, 'Community Leaders', Icons.people, '567 members'),
-                  _buildCommunityItem(context, 'Sellers', Icons.store, '2,154 members'),
-                  _buildCommunityItem(context, 'Buyers', Icons.shopping_cart, '1,879 members'),
-                  _buildCommunityItem(context, 'Farmers', Icons.agriculture, '3,426 members'),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCommunityItem(BuildContext context, String title, IconData icon, String memberCount) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: AppColors.card.withAlpha(230),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.8),
-            shape: BoxShape.circle,
           ),
-          child: Icon(
-            icon,
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Text(
-          memberCount,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black54,
-          ),
-        ),
-        trailing: ElevatedButton(
-          onPressed: () {
-            // Join community
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.accent,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-          ),
-          child: const Text('Join'),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
-        ),
-        onTap: () {
-          // Navigate to community details
-        },
+        ],
       ),
     );
   }

@@ -1,26 +1,15 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 
-// Message data model
-class ChatMessage {
-  final String content;
-  final bool isSentByMe;
-  final DateTime timestamp;
-
-  ChatMessage({
-    required this.content,
-    required this.isSentByMe,
-    required this.timestamp,
-  });
-}
-
 class ChatScreenPage extends StatefulWidget {
-  final String contactName;
-  
+  final String userName;
+  final IconData userIcon;
+
   const ChatScreenPage({
-    super.key,
-    required this.contactName,
-  });
+    Key? key,
+    required this.userName,
+    required this.userIcon,
+  }) : super(key: key);
 
   @override
   State<ChatScreenPage> createState() => _ChatScreenPageState();
@@ -28,75 +17,34 @@ class ChatScreenPage extends StatefulWidget {
 
 class _ChatScreenPageState extends State<ChatScreenPage> {
   final TextEditingController _messageController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-  
-  final List<ChatMessage> _messages = [
-    ChatMessage(
-      content: "Hello sir",
-      isSentByMe: false,
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-    ),
-    ChatMessage(
-      content: "Hello sir, how can I help you?",
-      isSentByMe: true,
-      timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
-    ),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    // Scroll to bottom after initial load
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
+  final List<Map<String, dynamic>> _messages = [];
 
   @override
   void dispose() {
     _messageController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
   void _sendMessage() {
-    if (_messageController.text.trim().isNotEmpty) {
-      setState(() {
-        _messages.add(
-          ChatMessage(
-            content: _messageController.text.trim(),
-            isSentByMe: true,
-            timestamp: DateTime.now(),
-          ),
-        );
+    if (_messageController.text.trim().isEmpty) return;
+
+    setState(() {
+      _messages.add({
+        'text': _messageController.text,
+        'isMe': true,
+        'time': TimeOfDay.now().format(context),
       });
-      
-      _messageController.clear();
-      
-      // Scroll to the bottom after sending a message
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
-    }
+    });
+
+    _messageController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF5A4A3A),
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: const Color(0xFF5A4A3A),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -104,97 +52,116 @@ class _ChatScreenPageState extends State<ChatScreenPage> {
         ),
         title: Row(
           children: [
-            const CircleAvatar(
-              backgroundColor: Colors.black,
+            CircleAvatar(
+              backgroundColor: Colors.white.withOpacity(0.3),
               child: Icon(
-                Icons.person,
+                widget.userIcon,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             Text(
-              widget.contactName,
+              widget.userName,
               style: const TextStyle(
                 color: Colors.white,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ],
         ),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(AppAssets.wheatField),
-            fit: BoxFit.cover,
-            opacity: 0.8,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.videocam, color: Colors.white),
+            onPressed: () {},
           ),
+          IconButton(
+            icon: const Icon(Icons.call, color: Colors.white),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.more_vert, color: Colors.white),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: _messages.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No messages yet. Start the conversation!',
+                        style: TextStyle(
+                          color: AppColors.lightText,
+                          fontSize: 16,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(20),
+                      itemCount: _messages.length,
+                      itemBuilder: (context, index) {
+                        final message = _messages[index];
+                        return _buildMessageBubble(
+                          message['text'],
+                          message['isMe'],
+                          message['time'],
+                        );
+                      },
+                    ),
+            ),
+          ),
+          _buildMessageInput(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMessageBubble(String text, bool isMe, String time) {
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.7,
+        ),
+        decoration: BoxDecoration(
+          color: isMe ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Chat messages
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final message = _messages[index];
-                  return _buildMessageBubble(message);
-                },
+            Text(
+              text,
+              style: TextStyle(
+                color: isMe ? Colors.white : AppColors.text,
+                fontSize: 14,
               ),
             ),
-            
-            // Message input field
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.brown.withOpacity(0.7),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.add, color: Colors.white),
-                    onPressed: () {
-                      // Add attachment functionality
-                    },
-                  ),
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.searchBar,
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: TextField(
-                        controller: _messageController,
-                        decoration: const InputDecoration(
-                          hintText: 'Type a message',
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                          border: InputBorder.none,
-                        ),
-                        onSubmitted: (text) {
-                          _sendMessage();
-                        },
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send, color: Colors.white),
-                    onPressed: _sendMessage,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.camera_alt, color: Colors.white),
-                    onPressed: () {
-                      // Camera functionality
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.mic, color: Colors.white),
-                    onPressed: () {
-                      // Voice recording functionality
-                    },
-                  ),
-                ],
+            const SizedBox(height: 4),
+            Text(
+              time,
+              style: TextStyle(
+                color: isMe ? Colors.white70 : AppColors.lightText,
+                fontSize: 10,
               ),
             ),
           ],
@@ -203,56 +170,53 @@ class _ChatScreenPageState extends State<ChatScreenPage> {
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
-    return Align(
-      alignment: message.isSentByMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.7,
-        ),
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: message.isSentByMe 
-              ? AppColors.primary.withOpacity(0.7) 
-              : Colors.white.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              message.content,
-              style: TextStyle(
-                color: message.isSentByMe ? Colors.white : Colors.black,
-                fontSize: 16,
+  Widget _buildMessageInput() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              decoration: InputDecoration(
+                hintText: 'Message',
+                filled: true,
+                fillColor: AppColors.searchBar,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
               ),
+              onSubmitted: (_) => _sendMessage(),
             ),
-            const SizedBox(height: 4),
-            Text(
-              _formatTimestamp(message.timestamp),
-              style: TextStyle(
-                color: message.isSentByMe ? Colors.white70 : Colors.black54,
-                fontSize: 12,
-              ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
             ),
-          ],
-        ),
+            child: IconButton(
+              icon: const Icon(Icons.send, color: Colors.white),
+              onPressed: _sendMessage,
+            ),
+          ),
+        ],
       ),
     );
   }
-  
-  String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final messageDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
-    
-    String timeString = '${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
-    
-    if (messageDate == today) {
-      return timeString;
-    } else {
-      return '${timestamp.day}/${timestamp.month} $timeString';
-    }
-  }
-} 
+}

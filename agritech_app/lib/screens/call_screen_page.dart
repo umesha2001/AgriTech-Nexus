@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import '../utils/constants.dart';
 
 class CallScreenPage extends StatefulWidget {
-  final String callerName;
-  
+  final String userName;
+  final IconData userIcon;
+
   const CallScreenPage({
-    super.key, 
-    required this.callerName,
-  });
+    Key? key,
+    required this.userName,
+    required this.userIcon,
+  }) : super(key: key);
 
   @override
   State<CallScreenPage> createState() => _CallScreenPageState();
@@ -17,222 +18,200 @@ class CallScreenPage extends StatefulWidget {
 class _CallScreenPageState extends State<CallScreenPage> {
   bool _isMuted = false;
   bool _isVideoOff = false;
-  bool _isMicMuted = false;
-  Duration _callDuration = Duration.zero;
-  late Timer _timer;
-  
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-  
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-  
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _callDuration = Duration(seconds: _callDuration.inSeconds + 1);
-      });
-    });
-  }
-  
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String minutes = twoDigits(duration.inMinutes.remainder(60));
-    String seconds = twoDigits(duration.inSeconds.remainder(60));
-    return "$minutes:$seconds";
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage(AppAssets.wheatField),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Top section with caller info
-              Padding(
-                padding: const EdgeInsets.only(top: 60.0),
-                child: Column(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // Main video area
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFF2C2416),
+                  Color(0xFF1A1410),
+                ],
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundColor: AppColors.primary,
+                    child: Icon(
+                      widget.userIcon,
+                      size: 60,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    widget.userName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Calling...',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Top bar
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Profile image
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                      child: const Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: 60,
-                      ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                    const SizedBox(height: 20),
-                    // Caller name
-                    Text(
-                      widget.callerName,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    // Call duration
-                    Text(
-                      _formatDuration(_callDuration),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                      ),
+                    IconButton(
+                      icon: const Icon(Icons.flip_camera_android, color: Colors.white),
+                      onPressed: () {},
                     ),
                   ],
                 ),
               ),
-              
-              // Bottom section with call controls
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                color: const Color(0xFF6E573A),
+            ),
+          ),
+          // Bottom controls
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(30),
                 child: Column(
                   children: [
-                    // Call control buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // Speaker button
-                        _buildCallControlButton(
-                          icon: Icons.volume_up,
-                          isActive: _isMuted,
-                          onPressed: () {
-                            setState(() {
-                              _isMuted = !_isMuted;
-                            });
-                          },
-                        ),
-                        
-                        // Video button
-                        _buildCallControlButton(
-                          icon: Icons.videocam,
-                          isActive: _isVideoOff,
-                          onPressed: () {
-                            setState(() {
-                              _isVideoOff = !_isVideoOff;
-                            });
-                          },
-                        ),
-                        
-                        // Microphone button
-                        _buildCallControlButton(
-                          icon: Icons.mic_off,
-                          isActive: _isMicMuted,
-                          onPressed: () {
-                            setState(() {
-                              _isMicMuted = !_isMicMuted;
-                            });
-                          },
-                        ),
-                        
-                        // End call button
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.call_end,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    const SizedBox(height: 20),
-                    
-                    // Add participant button
-                    InkWell(
-                      onTap: () {
-                        // Add participant functionality
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    // Add Participant Button
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.group,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          const Text(
+                          Icon(Icons.person_add, color: Colors.white),
+                          SizedBox(width: 12),
+                          Text(
                             'Add Participant',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 30),
+                    // Control buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildControlButton(
+                          icon: _isMuted ? Icons.mic_off : Icons.mic,
+                          label: 'Mute',
+                          isActive: _isMuted,
+                          onTap: () {
+                            setState(() {
+                              _isMuted = !_isMuted;
+                            });
+                          },
+                        ),
+                        _buildControlButton(
+                          icon: _isVideoOff ? Icons.videocam_off : Icons.videocam,
+                          label: 'Video',
+                          isActive: _isVideoOff,
+                          onTap: () {
+                            setState(() {
+                              _isVideoOff = !_isVideoOff;
+                            });
+                          },
+                        ),
+                        _buildControlButton(
+                          icon: Icons.screen_share,
+                          label: 'Share',
+                          onTap: () {},
+                        ),
+                        _buildControlButton(
+                          icon: Icons.call_end,
+                          label: 'End',
+                          color: Colors.red,
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
-  
-  Widget _buildCallControlButton({
+
+  Widget _buildControlButton({
     required IconData icon,
-    required bool isActive,
-    required VoidCallback onPressed,
+    required String label,
+    bool isActive = false,
+    Color? color,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: const BoxDecoration(
-        color: Colors.black,
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          color: isActive ? Colors.red : Colors.white,
-        ),
-        onPressed: onPressed,
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: color ?? (isActive ? AppColors.primary : Colors.white.withOpacity(0.2)),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+            ),
+          ),
+        ],
       ),
     );
   }
